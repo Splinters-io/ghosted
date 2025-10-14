@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ghosted V8 - A security tool that identifies potentially vulnerable "ghosted" domains in Content Security Policy (CSP) headers. It finds domains trusted by websites but available for registration, creating subdomain takeover risks.
+Ghosted V8 - A security tool that identifies potentially vulnerable "ghosted" domains in Content Security Policy (CSP) headers. It finds domains trusted by websites but available for registration, creating trust inheritance risks.
 
 ## Key Commands
 
