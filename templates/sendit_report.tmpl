@@ -1,0 +1,162 @@
+# Available Domain Risk Analysis
+## CSP Vulnerability Assessment
+
+**Report Date:** {{.ReportDate}}
+**Scan Target:** {{.ScanTarget}}
+
+---
+
+## Executive Summary
+
+This report identifies a critical CSP trust erosion vulnerability where {{.TotalAvailableDomains}} available domain{{if gt .TotalAvailableDomains 1}}s{{end}} ({{range $i, $d := .AvailableDomains}}{{if $i}}, {{end}}{{$d.Domain}}{{end}}) {{if eq .TotalAvailableDomains 1}}is{{else}}are{{end}} whitelisted in Content Security Policy script-src directives but can be registered by attackers for $10-25. The scale of impact is significant: {{range $i, $d := .AvailableDomains}}{{if gt $i 0}}{{if eq $i (sub $.TotalAvailableDomains 1)}} and {{else}}, {{end}}{{end}}{{$d.Domain}} affects {{$d.AffectedCount}} application{{if gt $d.AffectedCount 1}}s{{end}}{{end}}. PublicWWW research confirmed these domains are actively referenced across {{.TotalPublicWWWSites}} unique websites{{if .HighestImpactDomain}}, with {{.HighestImpactDomain}} appearing on {{.HighestImpactCount}} sites including major organizations{{end}}. If an attacker registers any of these domains, they gain JavaScript execution privileges on all affected applications, enabling credential theft, session hijacking, keylogging, and persistent backdoor installation. The attack cost is minimal ($10-15 for most domains) while the blast radius spans potentially thousands of users across enterprise and government organizations.
+
+---
+
+## Summary
+
+**{{.TotalAvailableDomains}} available domains** detected in CSP policies that can be registered by attackers:
+
+| Available Domain | Affected Applications | CSP Directive |
+|-----------------|----------------------|---------------|
+{{range .AvailableDomains -}}
+| {{.Domain}} | {{.AffectedCount}} domain{{if gt .AffectedCount 1}}s{{end}} | {{.CSPDirective}} |
+{{end}}
+
+---
+
+{{range .AvailableDomains}}
+## {{.Index}}. {{.Domain}}
+
+**Status:** {{.Status}}
+**Checked:** {{.CheckedAt}}
+
+### Affected Domains ({{.AffectedCount}} total)
+
+{{range $i, $affected := .AffectedDomains -}}
+{{add $i 1}}. {{$affected}}
+{{end}}
+
+### CSP Position
+
+**Directive:** `{{.CSPDirective}}`
+**Appears as:** `{{.CSPEntry}}`
+
+{{if .SharedPolicy -}}
+All {{.AffectedCount}} affected domains share an identical CSP policy with this directive:
+{{end}}
+
+```
+{{.CSPDirective}} {{.CSPDirectiveValue}}
+  {{range .CSPDomainList -}}
+  {{if eq . $.CSPEntry}}{{.}}        <--- AVAILABLE DOMAIN{{else}}{{.}}{{end}}
+  {{end}}
+  {{if .HasSelf}}'self';{{end}}
+```
+
+### What This Means
+
+**{{.DirectiveCapability}}**
+
+{{.DirectiveExplanation}}
+
+**Attack Scenario:**
+
+1. **Attacker registers {{.Domain}}** ({{.RegistrationCost}})
+2. **{{.AttackStep2}}**
+3. **{{.AttackStep3}}**:
+   ```{{.CodeLanguage}}
+   {{.AttackCode}}
+   ```
+
+4. **{{.AttackStep4}}**
+
+**Capabilities Granted:**
+{{range .Capabilities -}}
+- {{.}}
+{{end}}
+
+### Additional CSP Context
+
+**Other directives from same policy:**
+
+{{range .OtherDirectives -}}
+- `{{.Directive}}` - {{.Description}}
+{{end}}
+
+{{if .AdditionalNotes}}
+{{.AdditionalNotes}}
+{{end}}
+
+### PublicWWW Intelligence
+
+{{if .HasPublicWWWData -}}
+**Found {{len .PublicWWWResults}} websites currently using {{.Domain}}:**
+
+{{range .PublicWWWResults -}}
+- **{{.SiteURL}}**
+  ```
+  {{.Snippet}}
+  ```
+
+{{end}}
+
+**Analysis:**
+These websites are currently loading resources from `{{.Domain}}`. If an attacker registers this domain, they could:
+- Replace legitimate resources with malicious ones
+- Track which sites/users are accessing the domain
+- Identify high-value targets
+- Stage watering hole attacks
+
+{{else -}}
+**No PublicWWW data available**
+
+Run `ghosted research <scan_directory>` to search for websites using this domain.
+
+{{end}}
+
+---
+
+{{end}}
+
+## Summary: Critical Risk Assessment
+
+{{range .HighRiskSummaries}}
+### {{.DomainName}} - {{.RiskLevel}}
+
+{{.Description}}
+
+{{if .BulletPoints -}}
+{{range .BulletPoints -}}
+- {{.}}
+{{end}}
+{{end}}
+
+{{if .RegistrationImpact}}**Registration cost:** {{.RegistrationCost}}
+**Blast radius:** {{.BlastRadius}}
+{{end}}
+
+{{end}}
+
+---
+
+## Immediate Actions Required
+
+1. **Remove from CSP immediately:**
+{{range .ImmediateActions -}}
+   - `{{.Entry}}` from {{.Target}}
+{{end}}
+
+2. **Verify applications still function** after removal
+
+3. **Monitor for registration attempts** on all {{.TotalAvailableDomains}} domains
+
+4. **Review CSP policies for:**
+   - Other potentially expired/available domains
+   - HTTP entries in script-src (eliminate entirely)
+   - Overly permissive `connect-src *`
+   - Missing Subresource Integrity (SRI)
+
+---
+
+**Report Generated:** {{.ReportDate}}
+**Tool:** {{.ToolName}} {{.ToolVersion}}

@@ -1,0 +1,59 @@
+# Platform/Infrastructure Domains (Not Registrable)
+# These are extracted by publicsuffix but cannot be registered via Route53
+
+# AWS
+amazonaws.com
+cloudfront.net
+awsapps.com
+awsglobalaccelerator.com
+elasticbeanstalk.com
+
+# Azure
+azurewebsites.net
+azure.com
+azureedge.net
+cloudapp.net
+cloudapp.azure.com
+
+# Google Cloud
+googleapis.com
+googleusercontent.com
+appspot.com
+cloudfunctions.net
+run.app
+
+# CDN/Cloud Services
+akamaized.net
+akamaihd.net
+cloudflare.com
+cloudflare.net
+fastly.net
+fastlylb.net
+
+# GitHub/GitLab
+github.io
+githubusercontent.com
+gitlab.io
+
+# Heroku
+herokuapp.com
+herokussl.com
+
+# Netlify/Vercel
+netlify.app
+netlify.com
+vercel.app
+vercel.com
+
+# Firebase
+firebaseapp.com
+firebaseio.com
+
+# S3 (covered by amazonaws.com but explicit)
+s3.amazonaws.com
+s3-website-us-east-1.amazonaws.com
+
+# Other platforms
+digitaloceanspaces.com
+storage.googleapis.com
+blob.core.windows.net

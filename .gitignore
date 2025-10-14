@@ -1,0 +1,29 @@
+# API Keys and Secrets
+.env
+*.key
+publicwww.key
+whoapi.key
+
+# Output and Database
+output/
+*.db
+*.sqlite
+
+# Build artifacts
+ghosted
+ghosted.exe
+*.exe
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/*.csv
+logs/*.jsonl
