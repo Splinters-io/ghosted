@@ -1,9 +1,17 @@
 # Ghosted V8 - CSP Trust Erosion Scanner
 
+![Version](https://img.shields.io/badge/version-8.0-blue)
+![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
+![License](https://img.shields.io/badge/license-Security%20Research-green)
+![AWS](https://img.shields.io/badge/AWS-Route53-FF9900?logo=amazonaws)
+
 A security tool that identifies potentially vulnerable "ghosted" domains in Content Security Policy (CSP) headers - domains that are trusted by websites but may be available for registration, creating subdomain takeover risks.
+
+**Bonus Discovery:** As a side-effect of DNS enumeration, Ghosted also discovers organic typosquatting domains that resolve but weren't intentionally registered by the target organization. These can reveal phishing infrastructure, trademark violations, or forgotten test domains.
 
 ## Features
 
+### Core Capabilities
 - **CSP Header Analysis**: Scans websites for Content Security Policy headers
 - **Domain Extraction**: Identifies all external domains trusted by CSP policies
 - **Availability Checking**: Uses AWS Route53 to check if trusted domains are available for registration
@@ -12,6 +20,13 @@ A security tool that identifies potentially vulnerable "ghosted" domains in Cont
 - **High-Performance Scanning**: Beast mode with 1000 DNS concurrency
 - **Resume Capability**: Continue interrupted scans with wordlist tracking
 - **Automatic Organization**: Scan results organized into hot/archive folders
+
+### Bonus Intelligence
+- **Typosquatting Discovery**: DNS enumeration naturally uncovers typosquatted domains that resolve but weren't registered by the target
+  - Identifies potential phishing domains
+  - Reveals trademark infringement
+  - Discovers forgotten test/staging domains
+  - Exposes defensive registrations that need monitoring
 
 ## Installation
 
@@ -125,4 +140,4 @@ Reports include attribution to https://thecontractor.io/ghosted/
 
 ## Support
 
-For issues and questions, please open an issue on GitHub, however, huge caveat, this is a JC/Claude special, if you know me, you know I spend more time complaining about coding than learning to do it correctly.   
+For issues and questions, please open an issue on GitHub, however, if you know me, you know I spend more time complaining about my inability to code, than actually learning to code, this project is a JC/Claude Code special.
