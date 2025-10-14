@@ -29,13 +29,24 @@ A security tool that identifies potentially vulnerable "ghosted" domains in Cont
    go mod download
    ```
 
-3. Configure environment:
+3. Download wordlists (optional, for active enumeration):
+   ```bash
+   # Clone SecLists
+   git clone https://github.com/danielmiessler/SecLists.git
+
+   # Copy wordlists
+   cp SecLists/Discovery/DNS/dns-Jhaddix.txt wordlists/FUZZSUBS_CYFARE_1.txt
+   cp SecLists/Discovery/DNS/subdomains-top1million-110000.txt wordlists/FUZZSUBS_CYFARE_2.txt
+   ```
+   Note: Wordlists are only needed for `--wordlists 1` mode. Passive mode (`--wordlists 0`) works without them.
+
+4. Configure environment:
    ```bash
    cp .env.example .env
    # Edit .env with your API keys
    ```
 
-4. Build:
+5. Build:
    ```bash
    go build -o ghosted cmd/ghosted/main.go
    ```
