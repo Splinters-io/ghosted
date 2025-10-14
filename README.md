@@ -9,7 +9,7 @@ A security tool that identifies potentially vulnerable "ghosted" domains in Cont
 
 **Bonus Discovery:** As a side-effect of DNS enumeration, Ghosted also discovers organic typosquatting domains that resolve but weren't intentionally registered by the target organization. These can reveal phishing infrastructure, trademark violations, or forgotten test domains.
 
-## Real-World Impact
+## Real-World Impact / Attention grabbing application *polite chuckle*
 
 Ghosted has successfully identified CSP trust erosions at 122+ major organizations:
 
