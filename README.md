@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/badge/license-Security%20Research-green)
 ![AWS](https://img.shields.io/badge/AWS-Route53-FF9900?logo=amazonaws)
 
-A security tool that identifies potentially vulnerable "ghosted" domains in Content Security Policy (CSP) headers - domains that are trusted by websites but may be available for registration, creating subdomain takeover risks.
+A security tool that identifies "ghosted" domains in Content Security Policy (CSP) headers - domains that are trusted by websites but are available for sale, creating [mal-inheritance](https://thecontractor.io/malinheritance/) risks.
 
 **Bonus Discovery:** As a side-effect of DNS enumeration, Ghosted also discovers organic typosquatting domains that resolve but weren't intentionally registered by the target organization. These trusts can be abused in a few different ways, context always applies.
 
