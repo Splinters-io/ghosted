@@ -9,6 +9,44 @@ A security tool that identifies potentially vulnerable "ghosted" domains in Cont
 
 **Bonus Discovery:** As a side-effect of DNS enumeration, Ghosted also discovers organic typosquatting domains that resolve but weren't intentionally registered by the target organization. These can reveal phishing infrastructure, trademark violations, or forgotten test domains.
 
+## Real-World Impact
+
+Ghosted has successfully identified CSP trust erosions at 122+ major organizations:
+
+| | | | |
+|---|---|---|---|
+| aaa.com | abc.es | accenture.com | alamy.com |
+| americanexpress.com | amtrak.com | anu.edu.au | arizona.edu |
+| asahi.com | astm.org | au.dk | azurewebsites.net |
+| bankofamerica.com | bcg.com | bham.ac.uk | bhf.org.uk |
+| blackrock.com | bloomberg.com | bmw.com | bmwgroup.com |
+| burberry.com | cambridge.org | cancerresearchuk.org | capgemini.com |
+| case.edu | census.gov | chase.com | cigna.com |
+| cloudfront.net | cloudwaysapps.com | cmegroup.com | coca-cola.com |
+| cvs.com | de.com | detik.com | dhl.com |
+| donorbox.org | ebay.ca | ebay.com | ebay.com.au |
+| ebay.de | equifax.com | experian.com | ey.com |
+| fao.org | fashionnetwork.com | fifa.com | fujitsu.com |
+| gencat.cat | govt.nz | grubhub.com | gulfnews.com |
+| heart.org | hermes.com | hollywoodreporter.com | hpe.com |
+| huawei.com | icrc.org | impress.co.jp | intel.com |
+| ipsos.com | iqiyi.com | jnj.com | jst.go.jp |
+| leagueoflegends.com | lexisnexis.com | libero.it | linktr.ee |
+| lse.ac.uk | mass.gov | mercedes-benz.com | michelin.com |
+| mitre.org | mynavi.jp | nationaltrust.org.uk | netlify.app |
+| note.com | ntu.edu.sg | okta.com | on24.com |
+| panasonic.com | peatix.com | porsche.com | premierleague.com |
+| pwc.com | qatarairways.com | rakuten.com | rmit.edu.au |
+| siemens.com | simon.com | sky.it | squareup.com |
+| teamviewer.com | thomsonreuters.com | toyota.com | transunion.com |
+| uab.edu | uber.com | ucl.ac.uk | uga.edu |
+| ui.ac.id | un.org | unicef.org | unity.com |
+| universiteitleiden.nl | univision.com | upm.es | usbank.com |
+| usc.edu | uu.nl | uva.nl | uw.edu |
+| verizon.com | webex.com | wellsfargo.com | wildapricot.org |
+| wolterskluwer.com | wur.nl | yamaha.com | york.ac.uk |
+| zomato.com | zoom.us | | |
+
 ## Features
 
 ### Core Capabilities
@@ -140,4 +178,4 @@ Reports include attribution to https://thecontractor.io/ghosted/
 
 ## Support
 
-For issues and questions, please open an issue on GitHub, however, if you know me, you know I spend more time complaining about my inability to code, than actually learning to code, this project is a JC/Claude Code special.
+For issues and questions, please open an issue on GitHub.
