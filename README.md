@@ -125,4 +125,4 @@ Reports include attribution to https://thecontractor.io/ghosted/
 
 ## Support
 
-For issues and questions, please open an issue on GitHub.
+For issues and questions, please open an issue on GitHub, however, huge caveat, this is a JC/Claude special, if you know me, you know I spend more time complaining about coding than learning to do it correctly.   
