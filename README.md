@@ -211,4 +211,4 @@ Reports include attribution to https://thecontractor.io/ghosted/
 
 ## Support
 
-For issues and questions, please open an issue on GitHub, but for those who know me, this is a JC / Claude Code Special, I've spent enough time complaining I can't code to have learned every single syscall from scratch, so ... chat amongst yourselves ? <3 
+[Drop me a line](https://www.linkedin.com/in/thecontractor/) 
