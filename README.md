@@ -47,6 +47,50 @@ Ghosted has successfully identified CSP trust erosions at 122+ major organizatio
 | wolterskluwer.com | wur.nl | yamaha.com | york.ac.uk |
 | zomato.com | zoom.us | | |
 
+## Getting started
+
+**1. Download** the binary for your machine from the [latest release](https://github.com/Splinters-io/ghosted/releases/latest):
+
+| System | File |
+|---|---|
+| macOS, Apple silicon | `ghosted-darwin-arm64` |
+| macOS, Intel | `ghosted-darwin-amd64` |
+| Linux, x86-64 | `ghosted-linux-amd64` |
+| Linux, ARM64 | `ghosted-linux-arm64` |
+| Windows | `ghosted-windows-amd64.exe` |
+
+```bash
+# macOS / Linux
+mv ghosted-darwin-arm64 ghosted
+chmod +x ghosted
+xattr -d com.apple.quarantine ghosted   # macOS only: the binary isn't notarised
+shasum -a 256 -c SHA256SUMS --ignore-missing   # optional: check the download
+```
+
+Or build it yourself with Go 1.26 or later: `go build -o ghosted ./cmd/ghosted`
+
+**2. Try it without AWS.** Domains that have nameservers are settled from DNS, and the rest are listed as undecided:
+
+```bash
+./ghosted scan --no-aws --dns 1.1.1.1:53 example.com
+```
+
+**3. Add AWS** to get a registrar answer for the undecided ones. Any normal AWS credentials work (environment variables, `~/.aws/credentials` or `AWS_PROFILE`), as long as they allow `route53domains:CheckDomainAvailability`. AWS lists no charge for availability checks; Route 53 charges when you register a domain.
+
+```bash
+export AWS_PROFILE=ghosted
+./ghosted scan example.com
+```
+
+**4. Scan more.** Give it a list, or a browser capture for pages that load things lazily or behind a sign-in:
+
+```bash
+./ghosted scan -f targets.txt
+./ghosted har capture.har
+```
+
+Anything listed under "can be bought" is a domain your site trusts that someone else could register today.
+
 ## What it reads
 
 Ghosted looks in the same places as the [Ghosteds](https://ghosteds.com) webapp, without the reporting:
