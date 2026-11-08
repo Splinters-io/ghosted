@@ -1,11 +1,11 @@
-# Ghosted V8 - CSP Trust Erosion Scanner
+# Ghosted - Trust Erosion Scanner
 
 ![Version](https://img.shields.io/badge/version-8.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/license-Security%20Research-green)
 ![AWS](https://img.shields.io/badge/AWS-Route53-FF9900?logo=amazonaws)
 
-A security tool that identifies "ghosted" domains in Content Security Policy (CSP) headers - domains that are trusted by websites but are available for sale, creating [mal-inheritance](https://thecontractor.io/malinheritance/) risks.
+A security tool that finds "ghosted" domains: domains a website trusts, in its CSP, its pages, its scripts and its SPF and DMARC records, that are available for sale, creating [mal-inheritance](https://thecontractor.io/malinheritance/) risks.
 
 **Bonus Discovery:** As a side-effect of DNS enumeration, Ghosted also discovers organic typosquatting domains that resolve but weren't intentionally registered by the target organization. These trusts can be abused in a few different ways, context always applies.
 
@@ -47,107 +47,96 @@ Ghosted has successfully identified CSP trust erosions at 122+ major organizatio
 | wolterskluwer.com | wur.nl | yamaha.com | york.ac.uk |
 | zomato.com | zoom.us | | |
 
-## Features
+## What it reads
 
-### Core Capabilities
-- **CSP Header Analysis**: Scans websites for Content Security Policy headers
-- **Domain Extraction**: Identifies all external domains trusted by CSP policies
-- **Availability Checking**: Uses AWS Route53 to check if trusted domains are available for registration
-- **PublicWWW Research**: Discovers how available domains are used across the web (optional)
-- **Bug Bounty Reports**: Auto-generates professional security reports
-- **High-Performance Scanning**: Beast mode with 1000 DNS concurrency
-- **Resume Capability**: Continue interrupted scans with wordlist tracking
-- **Automatic Organization**: Scan results organized into hot/archive folders
+Ghosted looks in the same places as the [Ghosteds](https://ghosteds.com) webapp, without the reporting:
 
-### Bonus Intelligence
-- **Typosquatting Discovery**: DNS enumeration naturally uncovers typosquatted domains that resolve but weren't registered by the target
-  - Identifies potential phishing domains
-  - Reveals trademark infringement
-  - Discovers forgotten test/staging domains
-  - Exposes defensive registrations that need monitoring
+| Source | What becomes a domain |
+|---|---|
+| CSP headers | `Content-Security-Policy` and `Content-Security-Policy-Report-Only`, every host source in every directive |
+| HTML | `<meta>` CSP, `script`, `link` (stylesheet, preload, modulepreload, prefetch, preconnect, dns-prefetch, manifest), `img`, `srcset`, `iframe`, `form`/`formaction`, `a`/`area`, `audio`/`video`/`source`/`track`, `object`/`embed`, `use`/`image`, `<base>`, URL-valued `data-*` attributes and `style` attributes |
+| Inline blocks | `<style>`, JavaScript `<script>`, import maps, speculation rules and JSON / JSON-LD blocks |
+| CSS | `url()`, `@import` and `image-set()` in every stylesheet the page loads |
+| JavaScript | `import`/`export from`, dynamic `import()`, and URL-like string and template literals in every script the page loads (comments are ignored) |
+| JSON | manifests and import maps: URL values and URL-named keys (`src`, `url`, `href`, `start_url`, `scope`, `action`, `endpoint`) |
+| Redirects | every `Location` the landing page and its subresources redirect through |
+| SPF | `include`, `redirect`, `a`, `mx`, `exists` and `ptr` terms for the host and its registrable domain, following includes within SPF's ten-lookup limit |
+| DMARC | `rua` and `ruf` report addresses for the host and its registrable domain |
+| HAR files | every request the browser made, plus the headers and bodies the export carries |
+
+Pages are not rendered. Anything that only loads after scrolling, clicking or signing in comes in through a HAR file (see below).
+
+## How availability is decided
+
+1. Each reference is reduced to the domain you would actually buy (`mail.tripwire-dhs.us` → `tripwire-dhs.us`). Private suffixes such as `googleapis.com` and `github.io` count as registered domains, not suffixes. The target's own domain is left out.
+2. **DNS first.** A domain with nameservers of its own is registered, so the registrar is not asked. A random name is probed under each suffix first, so a suffix that answers everything can't make an unregistered domain look delegated.
+3. **AWS Route 53** `CheckDomainAvailability` decides everything else, one call every 4 seconds (Route 53 Domains throttles harder than that), retrying throttled calls.
+4. Suffixes AWS can't register are listed as `UNSUPPORTED_TLD` for you to check with a registrar for that suffix. Nothing is claimed about them.
+
+Only a registrar answer of `AVAILABLE` (or `AVAILABLE_RESERVED` / `AVAILABLE_PREORDER`) is reported as buyable.
 
 ## Installation
 
-### Prerequisites
+Go 1.26 or later.
 
-- Go 1.21 or higher
-- AWS Account (for Route53 domain checking)
-- Optional: PublicWWW API key (for enhanced research)
+```bash
+go build -o ghosted ./cmd/ghosted
+```
 
-### Setup
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   go mod download
-   ```
-
-3. Download wordlists (optional, for active enumeration):
-   ```bash
-   # Clone SecLists
-   git clone https://github.com/danielmiessler/SecLists.git
-
-   # Copy wordlists
-   cp SecLists/Discovery/DNS/dns-Jhaddix.txt wordlists/FUZZSUBS_CYFARE_1.txt
-   cp SecLists/Discovery/DNS/subdomains-top1million-110000.txt wordlists/FUZZSUBS_CYFARE_2.txt
-   ```
-   Note: Wordlists are only needed for `--wordlists 1` mode. Passive mode (`--wordlists 0`) works without them.
-
-4. Configure environment:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your API keys
-   ```
-
-5. Build:
-   ```bash
-   go build -o ghosted cmd/ghosted/main.go
-   ```
+AWS credentials come from the usual places (environment, `~/.aws/credentials`, a profile). The account needs `route53domains:CheckDomainAvailability`; the Route 53 Domains API lives in `us-east-1`. Without credentials, use `--no-aws`: domains with nameservers are still settled from DNS and the rest are listed as undecided.
 
 ## Usage
 
-### Basic Scanning
-
 ```bash
-# Scan a single domain
-./ghosted scan example.com --wordlists 1
+# One or more sites
+./ghosted scan example.com www.example.org
 
-# Beast mode (high concurrency - 1000 DNS/sec)
-./ghosted beast hosts.txt --wordlists 0  # Passive only
-./ghosted beast hosts.txt --wordlists 1  # Full enumeration
+# A list, one host per line (# comments allowed)
+./ghosted scan -f targets.txt
+
+# Subdomains first, then scan them all
+subfinder -d example.com -silent > hosts.txt
+./ghosted scan -f hosts.txt
+
+# A browser capture: DevTools > Network > right-click > "Save all as HAR with content"
+./ghosted har capture.har
+./ghosted har capture.har --target www.example.com
 ```
 
-### Research & Reporting
+| Flag | |
+|---|---|
+| `-f file` | read targets from a file |
+| `--target host` | the site a HAR belongs to (default: host of its first entry) |
+| `--no-aws` | DNS checks only, never call AWS |
+| `--no-mail` | skip SPF and DMARC |
+| `--json` | one JSON object per domain on stdout: status, provider and every reference |
+| `-v` | also list registered domains and where each was referenced |
+| `--concurrency n` | targets scanned at once (default 4) |
+| `--resources n` | scripts, stylesheets and manifests fetched per target (default 60) |
+| `--dns host:port` | DNS server for the nameserver checks (default: `/etc/resolv.conf`) |
 
-```bash
-# Research available domains via PublicWWW
-./ghosted research output/beast_example.com_20251003_120000
+If your resolver blocks ad and tracking domains, their nameserver checks fail and they fall through to AWS. Point `--dns` at a public resolver to settle them from DNS instead.
 
-# Generate send it report
-./ghosted sendit output/beast_example.com_20251003_120000
-```
-
-### Configuration
-
-**Environment Variables** (`.env`):
-- `AWS_ACCESS_KEY_ID` - AWS access key (required for Route53)
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key (required for Route53)
-- `AWS_REGION` - AWS region (must be us-east-1 for Route53 Domains API)
-- `PUBLICWWW_KEY` - PublicWWW API key (optional for domain research)
-
-## Output Structure
+### Output
 
 ```
-output/
-├── beast_example.com_20251003_120000/
-│   ├── database.db              # SQLite database
-│   ├── SENDIT_REPORT.md         # Comprehensive findings
-│   ├── reports/
-│   │   ├── high_risk_findings.md
-│   │   ├── csp_posture.md
-│   │   └── bugbounty/           # Per-domain reports
-│   └── logs/                    # Execution logs
+AVAILABLE  forgotten-vendor.com  (aws-route53)
+    www.example.com  script  <script> src  in https://www.example.com/
+      https://cdn.forgotten-vendor.com/widget.js
+
+1 can be bought:
+  forgotten-vendor.com  AVAILABLE
+
+2 under suffixes AWS cannot register; check these with a registrar:
+  vendor.com.br
+  reports.example.ru
+
+Totals:  AVAILABLE 1  REGISTERED 41  UNSUPPORTED_TLD 2
 ```
+
+Progress and warnings (pages that didn't load, scripts that didn't parse, limits reached) go to stderr.
+
+The older subdomain-enumeration, PublicWWW and reporting packages (`scanner/`, `checker/`, `reporter/`, `storage/`) are still in the repository but are not used by this command.
 
 ## Security Notice
 

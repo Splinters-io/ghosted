@@ -10,7 +10,7 @@ output/
 *.sqlite
 
 # Build artifacts
-ghosted
+/ghosted
 ghosted.exe
 *.exe
 
@@ -27,3 +27,6 @@ Thumbs.db
 *.log
 logs/*.csv
 logs/*.jsonl
+
+# Scratch and toolchain caches
+tmp/

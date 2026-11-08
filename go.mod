@@ -1,13 +1,15 @@
 module ghosted-v8
 
-go 1.24.6
+go 1.26.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.39.2
 	github.com/aws/aws-sdk-go-v2/config v1.31.12
 	github.com/aws/aws-sdk-go-v2/service/route53domains v1.34.4
 	github.com/mattn/go-sqlite3 v1.14.32
-	golang.org/x/net v0.44.0
+	github.com/miekg/dns v1.1.73
+	github.com/tdewolff/parse/v2 v2.8.20
+	golang.org/x/net v0.62.0
 )
 
 require (
@@ -22,4 +24,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.38.6 // indirect
 	github.com/aws/smithy-go v1.23.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
 )
